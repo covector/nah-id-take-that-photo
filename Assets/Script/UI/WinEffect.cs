@@ -10,6 +10,7 @@ public class WinEffect : MonoBehaviour
     public Animator animator;
     public int winSceneIndex;
     public Grabbing grabbingLogic;
+    bool won = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -21,6 +22,8 @@ public class WinEffect : MonoBehaviour
 
     public void PlayWin()
     {
+        if (won) return;
+        won = true;
         StartCoroutine(WinSequence());
         animator.ResetTrigger("Win");
         animator.SetTrigger("Win");

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static Utils;
 
 public class Grabbing : MonoBehaviour
@@ -32,12 +33,16 @@ public class Grabbing : MonoBehaviour
     public bool died { get; private set; } = false;
     public int grabbing { get; private set; } = 0; // 0: not grabbing, -1: left hand, 1: right hand
     public PlayerSound ps;
+    //InputAction grabInput;
+    //InputAction positionInput;
 
     void Start()
     {
         hillCenter = new Vector2(hill.position.x, hill.position.z);
         layerMask = LayerMask.GetMask("Ground");
         ps = GetComponent<PlayerSound>();
+        //grabInput = InputSystem.actions.FindAction("Grab");
+        //positionInput = InputSystem.actions.FindAction("Position");
     }
 
     bool isAtStart()
@@ -58,6 +63,9 @@ public class Grabbing : MonoBehaviour
     void Pulling()
     {
         grabPos = grabbing > 0 ? rightHand.position : leftHand.position;
+        //Vector2 screenPosition = positionInput.ReadValue<Vector2>();
+        //float relativeMouseY = Mathf.Clamp01(screenPosition.y / Screen.height);
+        //float relativeMouseX = Mathf.Clamp01(screenPosition.x / Screen.width);
         float relativeMouseY = Mathf.Clamp01(Input.mousePosition.y / Screen.height);
         float relativeMouseX = Mathf.Clamp01(Input.mousePosition.x / Screen.width);
         Vector3 direction = new Vector3(hillCenter.x , 0, hillCenter.y) - new Vector3(hipRB.position.x, 0, hipRB.position.z);
@@ -146,6 +154,7 @@ public class Grabbing : MonoBehaviour
     {
         if (grabbing != 0)  // in grabbing
         {
+            //if (canRelease && !grabInput.IsPressed())
             if (canRelease && !Input.GetMouseButton(0))
             {
                 UnGrab();
@@ -154,6 +163,7 @@ public class Grabbing : MonoBehaviour
         }
         else  // free falling
         {
+            //if (grabInput.IsPressed())
             if (Input.GetMouseButton(0))
             {
                 if (TryGrab())
@@ -170,8 +180,10 @@ public class Grabbing : MonoBehaviour
     {
         if (isAtStart())  // first grab
         {
-            if (Input.GetMouseButton(0)) {
-                canRelease = false;
+            if (Input.GetMouseButton(0))
+                //if (grabInput.IsPressed())
+                {
+                    canRelease = false;
                 RunDelay(this, () => canRelease = true, 1f);
                 leftHand.position = firstLeftPos;
                 rightHand.position = firstRightPos;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Hand : MonoBehaviour
 {
-    public bool canGrab = true;
+    public bool canGrab = false;
 
     private void OnTriggerEnter(Collider collider)
     {
@@ -20,19 +20,19 @@ public class Hand : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.collider.tag == "Terrain")
-        {
-            canGrab = true;
-        }
-    }
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.collider.tag == "Terrain")
+    //    {
+    //        canGrab = true;
+    //    }
+    //}
 
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.collider.tag == "Terrain")
-        {
-            canGrab = false;
-        }
-    }
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (collision.collider.tag == "Terrain")
+    //    {
+    //        canGrab = false;
+    //    }
+    //}
 }

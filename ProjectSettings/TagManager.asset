@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - Terrain
+  - TerrainBase
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 

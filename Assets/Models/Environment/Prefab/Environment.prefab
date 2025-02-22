@@ -1129,7 +1129,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6086703888382733042, guid: 4fe2102914baf77458037dd18bfb4d7f, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: TerrainBase
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4fe2102914baf77458037dd18bfb4d7f, type: 3}
       propertyPath: m_Name

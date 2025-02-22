@@ -6,7 +6,7 @@ public class Grabbing : MonoBehaviour
 {
     public Transform hill;
     public Vector2 hillCenter { get; private set; }
-    public float startHeight;
+    public Vector2 heightRange;
 
     public Rigidbody leftHand;
     public Rigidbody rightHand;
@@ -25,17 +25,24 @@ public class Grabbing : MonoBehaviour
     public float yOffset = -1f;
     public float arcStrength = 1f;
     public float tiltForce = 1f;
+    private const float bound = 20f;
+    private bool canRelease = false;
+    LayerMask layerMask;
+    public float fallDamageThreshold;
     public int grabbing { get; private set; } = 0; // 0: not grabbing, -1: left hand, 1: right hand
 
 
     void Start()
     {
         hillCenter = new Vector2(hill.position.x, hill.position.z);
+        layerMask = LayerMask.GetMask("Ground");
     }
 
     bool isAtStart()
     {
-        return hipRB.position.y < startHeight;
+        return hipRB.position.y > heightRange.x && hipRB.position.y < heightRange.y &&
+            hipRB.position.x > -bound && hipRB.position.x < bound &&
+            hipRB.position.z > -bound && hipRB.position.z < bound;
     }
 
     void ExtendArmToTryGrab()
@@ -101,11 +108,31 @@ public class Grabbing : MonoBehaviour
         rightHand.GetComponent<Rigidbody>().isKinematic = false;
     }
 
-    void Update()
+    void DeathCheck()
+    {
+        if (grabbing != 0) { return; }
+        bool voidCheck = hipRB.position.y < heightRange.x - bound;
+        bool hitGround = Physics.Raycast(hipRB.position, Vector3.down, 1f, layerMask);
+        bool fallDamageCheck = false;
+        if (hitGround) {
+            if (hipRB.linearVelocity.y < -fallDamageThreshold)
+            {
+                fallDamageCheck = true;
+            }
+        }
+
+        if (voidCheck || fallDamageCheck)
+        {
+            FindFirstObjectByType<DeathEffect>().PlayDeath();
+            this.enabled = false;
+        }
+    }
+
+        void Update()
     {
         if (grabbing != 0)  // in grabbing
         {
-            if (!Input.GetMouseButton(0))
+            if (canRelease && !Input.GetMouseButton(0))
             {
                 UnGrab();
             }
@@ -117,6 +144,8 @@ public class Grabbing : MonoBehaviour
                 TryGrab();
             }
         }
+
+        DeathCheck();
     }
 
     void FixedUpdate()
@@ -124,7 +153,8 @@ public class Grabbing : MonoBehaviour
         if (isAtStart())  // first grab
         {
             if (Input.GetMouseButton(0)) {
-                
+                canRelease = false;
+                RunDelay(this, () => canRelease = true, 1f);
                 leftHand.position = firstLeftPos;
                 rightHand.position = firstRightPos;
                 RandomGrab();
@@ -138,7 +168,6 @@ public class Grabbing : MonoBehaviour
         {
             //ExtendArmToTryGrab();
             Vector3 diff = (ToVector3(hillCenter) - new Vector3(hipRB.position.x, 0, hipRB.position.z)).normalized;
-            Debug.Log(diff);
             hipRB.AddForce(diff * tiltForce);
         }
     }

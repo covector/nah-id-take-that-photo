@@ -6,5 +6,6 @@ public class BackToMenu : MonoBehaviour
     public void Back()
     {
         SceneManager.LoadScene("Menu");
+        MusicManager.Instance.PlayMusic(0);
     }
 }

@@ -28,6 +28,7 @@ public class DeathEffect : MonoBehaviour
     {
         Time.timeScale = 0.1f;
         Time.fixedDeltaTime = 0.02f * Time.timeScale;
+        MusicManager.Instance.GetComponent<AudioSource>().pitch = 0.75f;
         for (float t = 0; t < 1f; t += Time.unscaledDeltaTime)
         {
             colorAdjustments.saturation.value = Mathf.Lerp(0, -65f, t);
@@ -38,6 +39,7 @@ public class DeathEffect : MonoBehaviour
         yield return new WaitForSecondsRealtime(2f);
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
+        MusicManager.Instance.GetComponent<AudioSource>().pitch = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

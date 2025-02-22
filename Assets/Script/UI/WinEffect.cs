@@ -24,6 +24,7 @@ public class WinEffect : MonoBehaviour
         StartCoroutine(WinSequence());
         animator.ResetTrigger("Win");
         animator.SetTrigger("Win");
+        GetComponent<AudioSource>().Play();
     }
 
     IEnumerator WinSequence()
@@ -35,5 +36,6 @@ public class WinEffect : MonoBehaviour
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
         SceneManager.LoadScene(winSceneIndex);
+        MusicManager.Instance.PlayMusic(1);
     }
 }

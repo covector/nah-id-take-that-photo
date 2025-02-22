@@ -31,12 +31,13 @@ public class Grabbing : MonoBehaviour
     public float fallDamageThreshold;
     public bool died { get; private set; } = false;
     public int grabbing { get; private set; } = 0; // 0: not grabbing, -1: left hand, 1: right hand
-
+    public PlayerSound ps;
 
     void Start()
     {
         hillCenter = new Vector2(hill.position.x, hill.position.z);
         layerMask = LayerMask.GetMask("Ground");
+        ps = GetComponent<PlayerSound>();
     }
 
     bool isAtStart()
@@ -109,16 +110,24 @@ public class Grabbing : MonoBehaviour
         rightHand.GetComponent<Rigidbody>().isKinematic = false;
     }
 
+    bool canPlaySound = true;
     void DeathCheck()
     {
         if (died || grabbing != 0) { return; }
-        bool voidCheck = hipRB.position.y < heightRange.x - bound;
-        bool hitGround = Physics.Raycast(hipRB.position, Vector3.down, 1f, layerMask);
+        bool voidCheck = hipRB.position.y < heightRange.x - 5f;
+        bool hitGround = Physics.Raycast(hipRB.position, Vector3.down, 1.2f, layerMask);
         bool fallDamageCheck = false;
         if (hitGround) {
-            if (hipRB.linearVelocity.y < -fallDamageThreshold)
+            float vy = hipRB.linearVelocity.y;
+            if (vy < -fallDamageThreshold)
             {
                 fallDamageCheck = true;
+            }
+            if (canPlaySound && vy < -1f)
+            {
+                ps.PlayCollisionSound(-vy / fallDamageThreshold / 2f);
+                canPlaySound = false;
+                RunDelay(this, () => canPlaySound = true, 0.5f);
             }
         }
 
@@ -128,7 +137,7 @@ public class Grabbing : MonoBehaviour
             RunDelay(this, () => {
                 FindFirstObjectByType<DeathEffect>().PlayDeath();
                 this.enabled = false;
-            }, 0.5f);
+            }, 0.3f);
             
         }
     }
@@ -140,13 +149,17 @@ public class Grabbing : MonoBehaviour
             if (canRelease && !Input.GetMouseButton(0))
             {
                 UnGrab();
+                ps.PlayReleaseSound();
             }
         }
         else  // free falling
         {
             if (Input.GetMouseButton(0))
             {
-                TryGrab();
+                if (TryGrab())
+                {
+                    ps.PlayGrabSound();
+                }
             }
         }
 

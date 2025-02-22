@@ -29,6 +29,7 @@ public class Grabbing : MonoBehaviour
     private bool canRelease = false;
     LayerMask layerMask;
     public float fallDamageThreshold;
+    public bool died { get; private set; } = false;
     public int grabbing { get; private set; } = 0; // 0: not grabbing, -1: left hand, 1: right hand
 
 
@@ -110,7 +111,7 @@ public class Grabbing : MonoBehaviour
 
     void DeathCheck()
     {
-        if (grabbing != 0) { return; }
+        if (died || grabbing != 0) { return; }
         bool voidCheck = hipRB.position.y < heightRange.x - bound;
         bool hitGround = Physics.Raycast(hipRB.position, Vector3.down, 1f, layerMask);
         bool fallDamageCheck = false;
@@ -123,8 +124,12 @@ public class Grabbing : MonoBehaviour
 
         if (voidCheck || fallDamageCheck)
         {
-            FindFirstObjectByType<DeathEffect>().PlayDeath();
-            this.enabled = false;
+            died = true;
+            RunDelay(this, () => {
+                FindFirstObjectByType<DeathEffect>().PlayDeath();
+                this.enabled = false;
+            }, 0.5f);
+            
         }
     }
 
